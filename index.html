@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>ORDENA AS SILABAS:</title>
+<title>ORDENA AS SÍLABAS:</title>
 
 <style>
 body{
@@ -86,14 +86,13 @@ input{
   margin-top:10px;
 }
 
-/* Container para botão + créditos lado a lado e à direita */
 #acao-container{
   display:flex;
-  justify-content:flex-end; /* alinha à direita */
+  justify-content:flex-end;
   align-items:center;
   gap:20px;
   margin-top:15px;
-  padding-right: 10px; /* distância da borda direita */
+  padding-right: 10px;
 }
 
 button{
@@ -120,7 +119,6 @@ button:hover{ background:#45a049; }
   min-height:60px;
 }
 
-/* Email no fundo da caixa */
 #email{
   position: absolute;
   bottom:5px;
@@ -130,7 +128,6 @@ button:hover{ background:#45a049; }
   color:#111184;
 }
 
-/* Animação pulsante para a mensagem final */
 @keyframes pulse{
   from { transform: scale(1); }
   to { transform: scale(1.05); }
@@ -151,7 +148,7 @@ button:hover{ background:#45a049; }
 <body>
 <div class="caixa">
 
-<h1>ORDENA AS SILABAS E DIGITA CORRETAMENTE!!</h1>
+<h1>ORDENA AS SÍLABAS E DIGITA CORRETAMENTE!!</h1>
 
 <div id="placar">
 ✅ Certas: <span id="certas">0</span> |
@@ -166,9 +163,8 @@ button:hover{ background:#45a049; }
 
 <div class="silabas" id="silabas"></div>
 
-<input id="resposta">
+<input id="resposta" autofocus>
 
-<!-- Botão e créditos lado a lado, à direita -->
 <div id="acao-container">
   <button onclick="verificar()">Validar</button>
   <div id="creditos">DESENVOLVIDO POR PROFESSOR MÁRIO MENEZES</div>
@@ -176,19 +172,18 @@ button:hover{ background:#45a049; }
 
 <p id="mensagem"></p>
 
-<!-- Email fixo no fundo -->
 <div id="email">Email: mario_menezes2009@edu.madeira.gov.pt</div>
 
 </div>
 
 <script>
-// === ARRAY DE PALAVRAS ===
+// === ARRAY DE PALAVRAS COMPLETO ===
 let palavras = [
 {imagem:"pato.png", correta:"pato"},
 {imagem:"pipa.png", correta:"pipa"},
 {imagem:"Pepe.png", correta:"Pepe", silabas:["Pe","pe"]},
 {imagem:"pote.png", correta:"pote"},
-{imagem:"palito.png", correta:"palito", silabas:["pa","li","to"]},
+{imagem:"palito.png", correta:"palito"},
 {imagem:"papa.png", correta:"papa"},
 {imagem:"teia.png", correta:"teia"},
 {imagem:"tapete.png", correta:"tapete"},
@@ -255,7 +250,7 @@ let palavras = [
 {imagem:"sapo.png", correta:"sapo"},
 {imagem:"sapato.png", correta:"sapato"},
 {imagem:"sola.png", correta:"sola"},
-{imagem:"sol.png", correta:"sol"},
+{imagem:"sol.png", correta:"sol", silabas:["sol"]},
 {imagem:"sino.png", correta:"sino"},
 {imagem:"sopa.png", correta:"sopa"},
 {imagem:"janela.png", correta:"janela"},
@@ -275,8 +270,7 @@ let palavras = [
 {imagem:"azulejo.png", correta:"azulejo"},
 {imagem:"baliza.png", correta:"baliza"},
 {imagem:"azul.png", correta:"azul", silabas:["a","zul"]},
-{imagem:"búzio.png", correta:"búzio"},
-{imagem:"sol.png", correta:"sol", silabas:["sol"]}
+{imagem:"búzio.png", correta:"búzio"}
 ];
 
 // === FUNÇÕES DO JOGO ===
@@ -287,12 +281,16 @@ function gerarSilabas(palavra){
 }
 
 function misturar(array){
-  if(array.length<=1) return array;
-  let resultado=[...array];
-  do{
-    resultado.sort(()=>Math.random()-0.5);
-  }while(resultado.join("")===array.join(""));
+  let resultado = [...array];
+  for (let i = resultado.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    [resultado[i], resultado[j]] = [resultado[j], resultado[i]];
+  }
   return resultado;
+}
+
+function normalize(str){
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 }
 
 let indice=0;
@@ -318,11 +316,13 @@ function novaPalavra(){
 
   let percentagem=((indice+1)/palavras.length)*100;
   document.getElementById("barra").style.width=percentagem+"%";
+
+  document.getElementById("resposta").focus();
 }
 
 function verificar(){
-  let resposta=document.getElementById("resposta").value.toLowerCase();
-  let correta=palavras[indice].correta.toLowerCase();
+  let resposta=normalize(document.getElementById("resposta").value);
+  let correta=normalize(palavras[indice].correta);
 
   if(resposta===correta){
     certas++;
@@ -366,5 +366,4 @@ document.getElementById("resposta").addEventListener("keypress",function(e){
 novaPalavra();
 </script>
 </body>
-
 </html>
