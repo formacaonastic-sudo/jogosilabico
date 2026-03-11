@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>ORDENA AS SÍLABAS:</title>
+<title>ORDENA AS SILABAS:</title>
 
 <style>
 body{
@@ -92,13 +92,12 @@ input{
   align-items:center;
   gap:20px;
   margin-top:15px;
-  padding-right: 10px;
+  padding-right:10px;
 }
 
 button{
   font-size:22px;
   padding:15px 50px;
-  display:block;
   border:none;
   border-radius:10px;
   background:#4CAF50;
@@ -132,6 +131,7 @@ button:hover{ background:#45a049; }
   from { transform: scale(1); }
   to { transform: scale(1.05); }
 }
+
 .final-message{
   display:inline-block;
   padding:20px 40px;
@@ -148,7 +148,7 @@ button:hover{ background:#45a049; }
 <body>
 <div class="caixa">
 
-<h1>ORDENA AS SÍLABAS E DIGITA CORRETAMENTE!!</h1>
+<h1>ORDENA AS SILABAS E DIGITA CORRETAMENTE!!</h1>
 
 <div id="placar">
 ✅ Certas: <span id="certas">0</span> |
@@ -163,7 +163,7 @@ button:hover{ background:#45a049; }
 
 <div class="silabas" id="silabas"></div>
 
-<input id="resposta" autofocus>
+<input id="resposta">
 
 <div id="acao-container">
   <button onclick="verificar()">Validar</button>
@@ -177,20 +177,20 @@ button:hover{ background:#45a049; }
 </div>
 
 <script>
-// === ARRAY DE PALAVRAS COMPLETO ===
+// === ARRAY COMPLETO DAS 92 PALAVRAS ===
 let palavras = [
 {imagem:"pato.png", correta:"pato"},
 {imagem:"pipa.png", correta:"pipa"},
 {imagem:"Pepe.png", correta:"Pepe", silabas:["Pe","pe"]},
 {imagem:"pote.png", correta:"pote"},
-{imagem:"palito.png", correta:"palito"},
+{imagem:"palito.png", correta:"palito", silabas:["pa","li","to"]},
 {imagem:"papa.png", correta:"papa"},
 {imagem:"teia.png", correta:"teia"},
-{imagem:"tapete.png", correta:"tapete"},
+{imagem:"tapete.png", correta:"tapete", silabas:["ta","pe","te"]},
 {imagem:"tio.png", correta:"tio"},
-{imagem:"totó.png", correta:"totó"},
+{imagem:"totó.png", correta:"totó", silabas:["to","tó"]},
 {imagem:"Tito.png", correta:"Tito", silabas:["Ti","to"]},
-{imagem:"apita.png", correta:"apita"},
+{imagem:"apita.png", correta:"apita", silabas:["a","pi","ta"]},
 {imagem:"lata.png", correta:"lata"},
 {imagem:"loto.png", correta:"loto"},
 {imagem:"lupa.png", correta:"lupa"},
@@ -201,7 +201,7 @@ let palavras = [
 {imagem:"dedo.png", correta:"dedo"},
 {imagem:"data.png", correta:"data"},
 {imagem:"Didi.png", correta:"Didi", silabas:["Di","di"]},
-{imagem:"dália.png", correta:"dália"},
+{imagem:"dália.png", correta:"dália", silabas:["dá","li","a"]},
 {imagem:"Dudu.png", correta:"Dudu", silabas:["Du","du"]},
 {imagem:"dia.png", correta:"dia"},
 {imagem:"mota.png", correta:"mota"},
@@ -248,14 +248,14 @@ let palavras = [
 {imagem:"Gugu.png", correta:"Gugu", silabas:["Gu","gu"]},
 {imagem:"papagaio.png", correta:"papagaio"},
 {imagem:"sapo.png", correta:"sapo"},
-{imagem:"sapato.png", correta:"sapato"},
+{imagem:"sapato.png", correta:"sapato", silabas:["sa","pa","to"]},
 {imagem:"sola.png", correta:"sola"},
-{imagem:"sol.png", correta:"sol", silabas:["sol"]},
+{imagem:"sumo.png", correta:"sumo"},
 {imagem:"sino.png", correta:"sino"},
 {imagem:"sopa.png", correta:"sopa"},
-{imagem:"janela.png", correta:"janela"},
+{imagem:"janela.png", correta:"janela", silabas:["ja","ne","la"]},
 {imagem:"judo.png", correta:"judo"},
-{imagem:"tijolo.png", correta:"tijolo"},
+{imagem:"tijolo.png", correta:"tijolo", silabas:["ti","jo","lo"]},
 {imagem:"jipe.png", correta:"jipe"},
 {imagem:"laje.png", correta:"laje"},
 {imagem:"Jaime.png", correta:"Jaime", silabas:["Jai","me"]},
@@ -270,34 +270,30 @@ let palavras = [
 {imagem:"azulejo.png", correta:"azulejo"},
 {imagem:"baliza.png", correta:"baliza"},
 {imagem:"azul.png", correta:"azul", silabas:["a","zul"]},
-{imagem:"búzio.png", correta:"búzio"}
+{imagem:"búzio.png", correta:"búzio"},
+{imagem:"saco.png", correta:"saco"}
 ];
 
 // === FUNÇÕES DO JOGO ===
 function gerarSilabas(palavra){
   let silabas = palavra.match(/[^aeiouãõáéíóúâêô]*[aeiouãõáéíóúâêô]+/gi);
-  if(!silabas) silabas=[palavra];
+  if(!silabas || silabas.length===0) silabas=[palavra];
   return silabas;
 }
 
 function misturar(array){
   let resultado = [...array];
-  for (let i = resultado.length - 1; i > 0; i--){
+  for(let i = resultado.length - 1; i > 0; i--){
     let j = Math.floor(Math.random() * (i + 1));
     [resultado[i], resultado[j]] = [resultado[j], resultado[i]];
   }
   return resultado;
 }
 
-function normalize(str){
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-}
-
-let indice=0;
-let certas=0;
-let erros=0;
+let indice=0, certas=0, erros=0;
 
 function novaPalavra(){
+  if(indice>=palavras.length) return;
   let atual=palavras[indice];
   document.getElementById("imagem").src=atual.imagem;
 
@@ -305,29 +301,23 @@ function novaPalavra(){
   let misturadas = misturar(silabas);
 
   let html="";
-  misturadas.forEach(function(s){
-    html+="<div class='silaba'>"+s+"</div>";
-  });
-
+  misturadas.forEach(s=>html+="<div class='silaba'>"+s+"</div>");
   document.getElementById("silabas").innerHTML=html;
+
   document.getElementById("resposta").value="";
   document.getElementById("mensagem").innerHTML="";
   document.getElementById("numeroPalavra").innerHTML="Palavra "+(indice+1)+" de "+palavras.length;
 
-  let percentagem=((indice+1)/palavras.length)*100;
-  document.getElementById("barra").style.width=percentagem+"%";
-
-  document.getElementById("resposta").focus();
+  document.getElementById("barra").style.width=((indice+1)/palavras.length*100)+"%";
 }
 
 function verificar(){
-  let resposta=normalize(document.getElementById("resposta").value);
-  let correta=normalize(palavras[indice].correta);
+  let resposta=document.getElementById("resposta").value.trim();
+  let correta=palavras[indice].correta;
 
   if(resposta===correta){
     certas++;
     document.getElementById("certas").innerHTML=certas;
-
     indice++;
     if(indice>=palavras.length){
       document.getElementById("mensagem").innerHTML=`
@@ -338,10 +328,8 @@ function verificar(){
         </div>`;
       return;
     }
-
     document.getElementById("mensagem").innerHTML="✅ BOM TRABALHO, CONTINUA!";
     setTimeout(novaPalavra,1200);
-
   }else{
     erros++;
     document.getElementById("erros").innerHTML=erros;
@@ -350,16 +338,14 @@ function verificar(){
 }
 
 function reiniciar(){
-  indice=0;
-  certas=0;
-  erros=0;
+  indice=0; certas=0; erros=0;
   document.getElementById("certas").innerHTML=0;
   document.getElementById("erros").innerHTML=0;
   document.getElementById("mensagem").innerHTML="";
   novaPalavra();
 }
 
-document.getElementById("resposta").addEventListener("keypress",function(e){
+document.getElementById("resposta").addEventListener("keypress", e=>{
   if(e.key==="Enter") verificar();
 });
 
